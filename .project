@@ -1,0 +1,15 @@
+Project=/home/bphillips/git/AnyEvent-Worker-DynamicPool CD=. {
+ dist.ini
+ lib=lib {
+  AnyEvent=AnyEvent {
+   Worker=Worker {
+    DynamicPool.pm
+   }
+  }
+ }
+ t=t {
+  01-basic.t
+  02-downsizing.t
+  03-failures.t
+ }
+}
