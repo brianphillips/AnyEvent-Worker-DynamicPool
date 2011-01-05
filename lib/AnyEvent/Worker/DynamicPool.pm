@@ -91,7 +91,11 @@ sub take_worker {
 
 sub ret_worker {
   my $self = shift;
-  $self->SUPER::ret_worker(@_);
+	my $worker = shift;
+	if(my $cb = $worker->{on_error} and my $e = $@){
+		$worker->{on_error}->($worker, $e, 1);
+	}
+  $self->SUPER::ret_worker($worker);
   $self->_reap_worker if($self->needs_less);
   return;
 }
