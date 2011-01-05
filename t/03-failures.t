@@ -3,14 +3,14 @@ use AnyEvent 5;
 use AnyEvent::Util qw(guard);
 
 BEGIN { use_ok('AnyEvent::Worker::DynamicPool') }
+my %calls;
 my $pool;
 $pool = AnyEvent::Worker::DynamicPool->new(
-	workers => 1,
+	workers => 0,
   max_workers => 5,
-	worker_args => [ sub { print "# $$ in child\n"; die "$$ Ha!"; }, on_error => sub { print STDERR "$$ died $@!\n";} ],
+	worker_args => [ sub { die "Ha!\n" if $_[0]; return 1}, on_error => sub { $calls{on_error}++ } ],
 );
 
-my %calls;
 BEGIN {
   foreach my $m(qw(_add_worker _reap_worker)){
     my $full_name = "AnyEvent::Worker::DynamicPool::$m";
@@ -25,14 +25,19 @@ my $cv = AE::cv;
 $cv->begin;
 $pool->do(1, sub {
     shift;
-    print STDERR "$$\n";
     guard { $cv->end; };
     is $@, 'Ha!', 'exception propogated';
-    is $_[0], 1, 'slept for 1 seconds';
+    is @_, 0, 'no return value';
+});
+$cv->begin;
+$pool->do(0, sub {
+    shift;
+    guard { $cv->end; };
+    is $@, '', 'no exception propogated';
+    is $_[0], 1, 'return value';
 });
 $cv->recv;
-
-diag explain \%calls;
+is $calls{on_error}, 1, 'one error callback executed';
 done_testing;
 
 

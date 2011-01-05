@@ -1,4 +1,4 @@
-Project=/home/bphillips/git/AnyEvent-Worker-DynamicPool CD=. {
+Project=~/git/AnyEvent-Worker-DynamicPool CD=. {
  dist.ini
  lib=lib {
   AnyEvent=AnyEvent {
@@ -12,4 +12,21 @@ Project=/home/bphillips/git/AnyEvent-Worker-DynamicPool CD=. {
   02-downsizing.t
   03-failures.t
  }
+}
+AnyEvent=~/perl5/lib/perl5/AnyEvent CD=. {
+ DNS.pm
+ Debug.pm
+ FAQ.pod
+ HTTPD.pm
+ Handle.pm
+ Intro.pod
+ Worker=Worker {
+  Pool.pm
+ }
+ Socket.pm
+ Strict.pm
+ TLS.pm
+ Util.pm
+ Worker.pm
+ constants.pl
 }

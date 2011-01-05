@@ -1,10 +1,16 @@
 package AnyEvent::Worker::DynamicPool;
 
+# ABSTRACT: Auto-resizing worker pool for AnyEvent
+
 use strict;
 use warnings;
 use base 'AnyEvent::Worker::Pool';
 use Carp qw(croak carp);
 use Scalar::Util qw(looks_like_number);
+
+=method new
+
+=cut
 
 sub new {
   my $class = shift;
@@ -101,3 +107,27 @@ sub ret_worker {
 }
 
 1;
+
+__END__
+
+=head1 SYNOPSIS
+
+	# identical interface and behavior to AnyEvent::Worker::Pool
+	$pool = AnyEvent::Worker::DynamicPool->new( 5, sub { ... } );
+	$pool->do(@args, sub { ... });
+
+	# alternate constructor arguments enable additional behavior
+    $pool = AnyEvent::Worker::DynamicPool->new(
+        workers => 5,
+        worker_args => [ sub { ... } ],
+        min_spare_workers => 2,
+				max_spare_workers => 5,
+
+    );
+
+=head1 SEE ALSO
+
+=for :list
+* L<AnyEvent::Worker::Pool>
+* L<AnyEvent::Worker>
+* L<AnyEvent>
