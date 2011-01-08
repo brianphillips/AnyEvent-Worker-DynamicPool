@@ -20,15 +20,15 @@ Apache documentation|http://httpd.apache.org/docs/2.0/mod/prefork.html>).
 Available settings:
 
 =for :list
-* workers
-number of workers to create on initialization
+* workers (default: 0)
+The number of workers to create on initialization.
 * worker_args
-arguments to pass to L<AnyEvent::Worker> to create the worker
-* max_workers
-hard limit on the maximum size of the pool, will be adjusted to match C<workers> setting if it is not specified or if the value specified is less than the initial number of workers requested.
-* min_spare_workers
+Arguments to pass to L<AnyEvent::Worker> to create the worker.
+* max_workers (default: C<workers> setting, but no less than C<1>)
+A hard limit on the maximum size of the pool. This will be adjusted to match C<workers> setting if it is not specified or if the value specified is less than the initial number of workers requested.
+* min_spare_workers (default: 0)
 instructs the pool to always have this number of idle workers waiting for new jobs, will be set to C<0> if it is not specified or to match the C<workers> setting if it is greater than the initial number of workers requested.
-* max_spare_workers
+* max_spare_workers (default: C<workers> setting)
 instructs the pool to reap any idle workers above this amount, will be adjusted to match C<workers> setting if it is not specified or is less than the initial number of workers requested
 
 =cut
@@ -47,6 +47,7 @@ sub new {
     croak "invalid args @_";
   }
   $args->{workers} ||= 0;
+  $args->{max_workers} ||= $args->{workers} || 1;
   $args->{worker_args} ||= [];
   $args->{min_spare_workers} ||= 0;
   $args->{max_spare_workers} ||= $args->{workers} || 0;
@@ -62,7 +63,6 @@ sub new {
     carp "adjusting min_spare_workers to reflect number of workers requested: $args->{workers} (previously $args->{min_spare_workers})";
     $args->{min_spare_workers} = $args->{workers};
   }
-  $args->{max_workers} ||= $args->{workers} || 1;
 
   my $self = $class->SUPER::new($args->{workers}, @{ $args->{worker_args} });
   $args->{most_workers_in_pool} = $args->{total_workers} = $self->num_available_workers;
@@ -99,6 +99,8 @@ sub most_workers_in_pool {
 }
 
 =method num_available_workers
+
+Returns the number of available workers in this pool.
 
 =cut
 
@@ -170,10 +172,10 @@ available workers exceeds the C<max_spare_workers> setting.
 
 sub ret_worker {
   my $self = shift;
-	my $worker = shift;
-	if(my $cb = $worker->{on_error} and my $e = $@){
-		$worker->{on_error}->($worker, $e, 1);
-	}
+  my $worker = shift;
+  if(my $cb = $worker->{on_error} and my $e = $@){
+    $worker->{on_error}->($worker, $e, 1);
+  }
   $self->SUPER::ret_worker($worker);
   $self->_reap_worker if($self->needs_less);
   return;
@@ -185,17 +187,17 @@ __END__
 
 =head1 SYNOPSIS
 
-	# identical interface and behavior to AnyEvent::Worker::Pool
-	$pool = AnyEvent::Worker::DynamicPool->new( 5, sub { ... } );
-	$pool->do(@args, sub { ... });
+  # identical interface and behavior to AnyEvent::Worker::Pool
+  $pool = AnyEvent::Worker::DynamicPool->new( 5, sub { ... } );
+  $pool->do(@args, sub { ... });
 
-	# alternate constructor arguments enable additional behavior
+  # alternate constructor arguments enable additional behavior
     $pool = AnyEvent::Worker::DynamicPool->new(
         workers => 5,
         worker_args => [ sub { ... } ],
         min_spare_workers => 2,
-				max_spare_workers => 5,
-
+        max_spare_workers => 5,
+        # additional args
     );
 
 =head1 SEE ALSO
