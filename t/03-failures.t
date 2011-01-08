@@ -6,9 +6,9 @@ BEGIN { use_ok('AnyEvent::Worker::DynamicPool') }
 my %calls;
 my $pool;
 $pool = AnyEvent::Worker::DynamicPool->new(
-	workers => 0,
+  workers     => 0,
   max_workers => 5,
-	worker_args => [ sub { die "Ha!\n" if $_[0]; return 1}, on_error => sub { $calls{on_error}++ } ],
+  worker_args => [ sub { die "Ha!\n" if $_[0]; return 1 }, on_error => sub { $calls{on_error}++ } ],
 );
 
 BEGIN {
