@@ -173,7 +173,11 @@ available workers exceeds the C<max_spare_workers> setting.
 sub ret_worker {
   my $self = shift;
   my $worker = shift;
-  if(my $cb = $worker->{on_error} and my $e = $@){
+
+  # localizing $@ makes sure nothing munges $@ so that it will still be in place for the "do" callback
+  my $e = local $@ = $@;
+
+  if($e and my $cb = $worker->{on_error}){
     $worker->{on_error}->($worker, $e, 1);
   }
   $self->SUPER::ret_worker($worker);
