@@ -60,7 +60,7 @@ $cv = AE::cv;
 $cv->begin, $pool->do(1, sub { $cv->end }) for 1..5;
 $cv->recv;
 is $calls{_add_worker}, 5, '5 workers added';
-is $pool->most_active_workers, 5, '5 workers active at most';
+is $pool->most_workers_in_pool, 5, '5 workers active at most';
 
 clear_call_log();
 
@@ -77,7 +77,7 @@ $cv->recv;
 is $calls{_add_worker}, 10, 'all 10 workers added';
 is $calls{_reap_worker}, 5, '5 workers reaped to satisfy max_spare_workers';
 is $pool->{total_workers}, 5, 'only 5 workers remain';
-is $pool->most_active_workers, 10, '10 workers active at most';
+is $pool->most_workers_in_pool, 10, '10 workers active at most';
 
 done_testing;
 

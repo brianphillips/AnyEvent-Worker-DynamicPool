@@ -4,7 +4,7 @@ use AnyEvent::Util qw(guard);
 
 use_ok('AnyEvent::Worker::DynamicPool');
 my $pool;
-$pool = AnyEvent::Worker::DynamicPool->new(0, sub { my $avail = $pool->num_available_workers; sleep 1; return($avail, $pool->most_active_workers) } );
+$pool = AnyEvent::Worker::DynamicPool->new(0, sub { my $avail = $pool->num_available_workers; sleep 1; return($avail, $pool->most_workers_in_pool) } );
 
 my %calls;
 foreach my $m(qw(_add_worker _reap_worker)){
@@ -36,7 +36,7 @@ $pool->do(abc => "123", sub {
 
 $cv->recv;
 is $pool->num_available_workers, 0, 'no workers in pool';
-is $pool->most_active_workers, 1, 'one active worker at any point in time';
+is $pool->most_workers_in_pool, 1, 'one active worker at any point in time';
 is $calls{_add_worker}, 1, 'one worker is added';
 is $calls{_reap_worker} || 0, 0, 'no workers were reaped';
 

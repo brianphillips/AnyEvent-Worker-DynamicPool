@@ -15,7 +15,7 @@ SYNOPSIS
             worker_args => [ sub { ... } ],
             min_spare_workers => 2,
             max_spare_workers => 5,
-
+            # additional args
         );
 
 METHODS
@@ -29,28 +29,28 @@ METHODS
 
     Available settings:
 
-    *   workers
+    *   workers (default: 0)
 
-        number of workers to create on initialization
+        The number of workers to create on initialization.
 
     *   worker_args
 
-        arguments to pass to AnyEvent::Worker to create the worker
+        Arguments to pass to AnyEvent::Worker to create the worker.
 
-    *   max_workers
+    *   max_workers (default: "workers" setting, but no less than 1)
 
-        hard limit on the maximum size of the pool, will be adjusted to
-        match "workers" setting if it is not specified or if the value
+        A hard limit on the maximum size of the pool. This will be adjusted
+        to match "workers" setting if it is not specified or if the value
         specified is less than the initial number of workers requested.
 
-    *   min_spare_workers
+    *   min_spare_workers (default: 0)
 
         instructs the pool to always have this number of idle workers
         waiting for new jobs, will be set to 0 if it is not specified or to
         match the "workers" setting if it is greater than the initial number
         of workers requested.
 
-    *   max_spare_workers
+    *   max_spare_workers (default: "workers" setting)
 
         instructs the pool to reap any idle workers above this amount, will
         be adjusted to match "workers" setting if it is not specified or is
@@ -61,6 +61,8 @@ METHODS
     to the "max_workers" setting.
 
   num_available_workers
+    Returns the number of available workers in this pool.
+
   can_expand
     Compares the total number of workers with the "max_workers" setting.
 

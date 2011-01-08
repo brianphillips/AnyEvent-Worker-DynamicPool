@@ -34,6 +34,7 @@ sub new {
     croak "invalid args @_";
   }
   $args->{workers} ||= 0;
+  $args->{max_workers} ||= $args->{workers} || 1;
   $args->{worker_args} ||= [];
   $args->{min_spare_workers} ||= 0;
   $args->{max_spare_workers} ||= $args->{workers} || 0;
@@ -49,7 +50,6 @@ sub new {
     carp "adjusting min_spare_workers to reflect number of workers requested: $args->{workers} (previously $args->{min_spare_workers})";
     $args->{min_spare_workers} = $args->{workers};
   }
-  $args->{max_workers} ||= $args->{workers} || 1;
 
   my $self = $class->SUPER::new($args->{workers}, @{ $args->{worker_args} });
   $args->{most_workers_in_pool} = $args->{total_workers} = $self->num_available_workers;
@@ -118,7 +118,11 @@ sub take_worker {
 sub ret_worker {
   my $self = shift;
   my $worker = shift;
-  if(my $cb = $worker->{on_error} and my $e = $@){
+
+  # localizing $@ makes sure nothing munges $@ so that it will still be in place for the "do" callback
+  my $e = local $@ = $@;
+
+  if($e and my $cb = $worker->{on_error}){
     $worker->{on_error}->($worker, $e, 1);
   }
   $self->SUPER::ret_worker($worker);
@@ -152,7 +156,7 @@ version 0.001
         worker_args => [ sub { ... } ],
         min_spare_workers => 2,
         max_spare_workers => 5,
-
+        # additional args
     );
 
 =head1 METHODS
@@ -172,31 +176,31 @@ Available settings:
 
 =item *
 
-workers
+workers (default: 0)
 
-number of workers to create on initialization
+The number of workers to create on initialization.
 
 =item *
 
 worker_args
 
-arguments to pass to L<AnyEvent::Worker> to create the worker
+Arguments to pass to L<AnyEvent::Worker> to create the worker.
 
 =item *
 
-max_workers
+max_workers (default: C<workers> setting, but no less than C<1>)
 
-hard limit on the maximum size of the pool, will be adjusted to match C<workers> setting if it is not specified or if the value specified is less than the initial number of workers requested.
+A hard limit on the maximum size of the pool. This will be adjusted to match C<workers> setting if it is not specified or if the value specified is less than the initial number of workers requested.
 
 =item *
 
-min_spare_workers
+min_spare_workers (default: 0)
 
 instructs the pool to always have this number of idle workers waiting for new jobs, will be set to C<0> if it is not specified or to match the C<workers> setting if it is greater than the initial number of workers requested.
 
 =item *
 
-max_spare_workers
+max_spare_workers (default: C<workers> setting)
 
 instructs the pool to reap any idle workers above this amount, will be adjusted to match C<workers> setting if it is not specified or is less than the initial number of workers requested
 
@@ -208,6 +212,8 @@ Returns the maximum size of this pool.  Will always be less than or
 equal to the C<max_workers> setting.
 
 =head2 num_available_workers
+
+Returns the number of available workers in this pool.
 
 =head2 can_expand
 
