@@ -5,16 +5,16 @@ VERSION
     version 0.001
 
 SYNOPSIS
-            # identical interface and behavior to AnyEvent::Worker::Pool
-            $pool = AnyEvent::Worker::DynamicPool->new( 5, sub { ... } );
-            $pool->do(@args, sub { ... });
+      # identical interface and behavior to AnyEvent::Worker::Pool
+      $pool = AnyEvent::Worker::DynamicPool->new( 5, sub { ... } );
+      $pool->do(@args, sub { ... });
 
-            # alternate constructor arguments enable additional behavior
+      # alternate constructor arguments enable additional behavior
         $pool = AnyEvent::Worker::DynamicPool->new(
             workers => 5,
             worker_args => [ sub { ... } ],
             min_spare_workers => 2,
-                                    max_spare_workers => 5,
+            max_spare_workers => 5,
 
         );
 

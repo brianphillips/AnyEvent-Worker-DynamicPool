@@ -117,10 +117,10 @@ sub take_worker {
 
 sub ret_worker {
   my $self = shift;
-	my $worker = shift;
-	if(my $cb = $worker->{on_error} and my $e = $@){
-		$worker->{on_error}->($worker, $e, 1);
-	}
+  my $worker = shift;
+  if(my $cb = $worker->{on_error} and my $e = $@){
+    $worker->{on_error}->($worker, $e, 1);
+  }
   $self->SUPER::ret_worker($worker);
   $self->_reap_worker if($self->needs_less);
   return;
@@ -142,16 +142,16 @@ version 0.001
 
 =head1 SYNOPSIS
 
-	# identical interface and behavior to AnyEvent::Worker::Pool
-	$pool = AnyEvent::Worker::DynamicPool->new( 5, sub { ... } );
-	$pool->do(@args, sub { ... });
+  # identical interface and behavior to AnyEvent::Worker::Pool
+  $pool = AnyEvent::Worker::DynamicPool->new( 5, sub { ... } );
+  $pool->do(@args, sub { ... });
 
-	# alternate constructor arguments enable additional behavior
+  # alternate constructor arguments enable additional behavior
     $pool = AnyEvent::Worker::DynamicPool->new(
         workers => 5,
         worker_args => [ sub { ... } ],
         min_spare_workers => 2,
-				max_spare_workers => 5,
+        max_spare_workers => 5,
 
     );
 
