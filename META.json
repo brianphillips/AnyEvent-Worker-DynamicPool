@@ -1,0 +1,68 @@
+{
+   "abstract" : "Auto-resizing worker pool for AnyEvent",
+   "author" : [
+      "Brian Phillips <bphillips@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-Worker-DynamicPool",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent::Worker::Pool" : 0,
+            "Carp" : 0,
+            "Scalar::Util" : 0,
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "AnyEvent" : "5",
+            "AnyEvent::Util" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "provides" : {
+      "AnyEvent::Worker::DynamicPool" : {
+         "file" : "lib/AnyEvent/Worker/DynamicPool.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/brianphillips/AnyEvent-Worker-DynamicPool/tree",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/brianphillips/AnyEvent-Worker-DynamicPool.git",
+         "web" : "http://github.com/brianphillips/AnyEvent-Worker-DynamicPool/tree"
+      }
+   },
+   "version" : "0.001"
+}
+

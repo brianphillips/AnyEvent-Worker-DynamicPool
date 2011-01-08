@@ -1,0 +1,40 @@
+---
+abstract: 'Auto-resizing worker pool for AnyEvent'
+author:
+  - 'Brian Phillips <bphillips@cpan.org>'
+build_requires:
+  AnyEvent: 5
+  AnyEvent::Util: 0
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-Worker-DynamicPool
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  AnyEvent::Worker::DynamicPool:
+    file: lib/AnyEvent/Worker/DynamicPool.pm
+    version: 0.001
+requires:
+  AnyEvent::Worker::Pool: 0
+  Carp: 0
+  Scalar::Util: 0
+  perl: 5.006
+resources:
+  homepage: http://github.com/brianphillips/AnyEvent-Worker-DynamicPool/tree
+  repository: git://github.com/brianphillips/AnyEvent-Worker-DynamicPool.git
+version: 0.001

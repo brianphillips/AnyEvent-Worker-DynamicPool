@@ -1,4 +1,15 @@
+#
+# This file is part of AnyEvent-Worker-DynamicPool
+#
+# This software is copyright (c) 2011 by Brian Phillips.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
 package AnyEvent::Worker::DynamicPool;
+BEGIN {
+  $AnyEvent::Worker::DynamicPool::VERSION = '0.001';
+}
 
 # ABSTRACT: Auto-resizing worker pool for AnyEvent
 
@@ -8,30 +19,6 @@ use base 'AnyEvent::Worker::Pool';
 use Carp qw(croak carp);
 use Scalar::Util qw(looks_like_number);
 
-=method new
-
-Creates a new pool of workers.  This module extends
-L<AnyEvent::Worker::Pool> and adds dynamic resizing of the pool based on
-the workload and the settings specified when the pool was created. The
-settings for this module are inspired by Apache's pre-forking HTTP server
-settings controlling how child processes are managed (L<corresponding
-Apache documentation|http://httpd.apache.org/docs/2.0/mod/prefork.html>).
-
-Available settings:
-
-=for :list
-* workers
-number of workers to create on initialization
-* worker_args
-arguments to pass to L<AnyEvent::Worker> to create the worker
-* max_workers
-hard limit on the maximum size of the pool, will be adjusted to match C<workers> setting if it is not specified or if the value specified is less than the initial number of workers requested.
-* min_spare_workers
-instructs the pool to always have this number of idle workers waiting for new jobs, will be set to C<0> if it is not specified or to match the C<workers> setting if it is greater than the initial number of workers requested.
-* max_spare_workers
-instructs the pool to reap any idle workers above this amount, will be adjusted to match C<workers> setting if it is not specified or is less than the initial number of workers requested
-
-=cut
 
 sub new {
   my $class = shift;
@@ -86,42 +73,23 @@ sub _reap_worker {
   return $self;
 }
 
-=method most_workers_in_pool
-
-Returns the maximum size of this pool.  Will always be less than or
-equal to the C<max_workers> setting.
-
-=cut
 
 sub most_workers_in_pool {
   my $self = shift;
   return $self->{most_workers_in_pool};
 }
 
-=method num_available_workers
-
-=cut
 
 sub num_available_workers {
   return scalar(@{ shift->{pool} });
 }
 
-=method can_expand
-
-Compares the total number of workers with the C<max_workers> setting.
-
-=cut
 
 sub can_expand {
   my $self = shift;
   return $self->{total_workers} < $self->{max_workers};
 }
 
-=method needs_more
-
-Compares the number of available workers with the C<min_spare_workers> setting.
-
-=cut
 
 sub needs_more {
   my $self = shift;
@@ -129,11 +97,6 @@ sub needs_more {
   return !$available || $available < $self->{min_spare_workers};
 }
 
-=method needs_less
-
-Compares the number of available workers with the C<max_spare_workers> setting.
-
-=cut
 
 sub needs_less {
   my $self = shift;
@@ -141,15 +104,6 @@ sub needs_less {
   return $available && $available > $self->{max_spare_workers};
 }
 
-=method take_worker
-
-Overrides L<AnyEvent::Worker::DynamicPool>'s C<take_worker> method.
-Extra workers will be created if there are no spares and the total
-number of workers is not greater than the C<max_workers> setting.
-The C<min_spare_workers> setting will also be considered and additional
-workers will be created if the number of available workers is too low.
-
-=cut
 
 sub take_worker {
   my $self = shift;
@@ -160,13 +114,6 @@ sub take_worker {
   return;
 }
 
-=method ret_worker
-
-Overrides L<AnyEvent::Worker::DynamicPool>'s C<ret_worker> method.
-Extra workers will be reaped after they finish a job if the number of
-available workers exceeds the C<max_spare_workers> setting.
-
-=cut
 
 sub ret_worker {
   my $self = shift;
@@ -181,7 +128,17 @@ sub ret_worker {
 
 1;
 
-__END__
+
+
+=pod
+
+=head1 NAME
+
+AnyEvent::Worker::DynamicPool - Auto-resizing worker pool for AnyEvent
+
+=head1 VERSION
+
+version 0.001
 
 =head1 SYNOPSIS
 
@@ -198,9 +155,117 @@ __END__
 
     );
 
+=head1 METHODS
+
+=head2 new
+
+Creates a new pool of workers.  This module extends
+L<AnyEvent::Worker::Pool> and adds dynamic resizing of the pool based on
+the workload and the settings specified when the pool was created. The
+settings for this module are inspired by Apache's pre-forking HTTP server
+settings controlling how child processes are managed (L<corresponding
+Apache documentation|http://httpd.apache.org/docs/2.0/mod/prefork.html>).
+
+Available settings:
+
+=over 4
+
+=item *
+
+workers
+
+number of workers to create on initialization
+
+=item *
+
+worker_args
+
+arguments to pass to L<AnyEvent::Worker> to create the worker
+
+=item *
+
+max_workers
+
+hard limit on the maximum size of the pool, will be adjusted to match C<workers> setting if it is not specified or if the value specified is less than the initial number of workers requested.
+
+=item *
+
+min_spare_workers
+
+instructs the pool to always have this number of idle workers waiting for new jobs, will be set to C<0> if it is not specified or to match the C<workers> setting if it is greater than the initial number of workers requested.
+
+=item *
+
+max_spare_workers
+
+instructs the pool to reap any idle workers above this amount, will be adjusted to match C<workers> setting if it is not specified or is less than the initial number of workers requested
+
+=back
+
+=head2 most_workers_in_pool
+
+Returns the maximum size of this pool.  Will always be less than or
+equal to the C<max_workers> setting.
+
+=head2 num_available_workers
+
+=head2 can_expand
+
+Compares the total number of workers with the C<max_workers> setting.
+
+=head2 needs_more
+
+Compares the number of available workers with the C<min_spare_workers> setting.
+
+=head2 needs_less
+
+Compares the number of available workers with the C<max_spare_workers> setting.
+
+=head2 take_worker
+
+Overrides L<AnyEvent::Worker::DynamicPool>'s C<take_worker> method.
+Extra workers will be created if there are no spares and the total
+number of workers is not greater than the C<max_workers> setting.
+The C<min_spare_workers> setting will also be considered and additional
+workers will be created if the number of available workers is too low.
+
+=head2 ret_worker
+
+Overrides L<AnyEvent::Worker::DynamicPool>'s C<ret_worker> method.
+Extra workers will be reaped after they finish a job if the number of
+available workers exceeds the C<max_spare_workers> setting.
+
 =head1 SEE ALSO
 
-=for :list
-* L<AnyEvent::Worker::Pool>
-* L<AnyEvent::Worker>
-* L<AnyEvent>
+=over 4
+
+=item *
+
+L<AnyEvent::Worker::Pool>
+
+=item *
+
+L<AnyEvent::Worker>
+
+=item *
+
+L<AnyEvent>
+
+=back
+
+=head1 AUTHOR
+
+Brian Phillips <bphillips@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Brian Phillips.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+
+__END__
+

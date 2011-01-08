@@ -1,0 +1,16 @@
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/AnyEvent/Worker/DynamicPool.pm
+t/00-compile.t
+t/01-basic.t
+t/02-downsizing.t
+t/03-failures.t
+xt/release/distmeta.t
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t
+xt/release/portability.t

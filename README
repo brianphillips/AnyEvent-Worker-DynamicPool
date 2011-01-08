@@ -1,0 +1,102 @@
+NAME
+    AnyEvent::Worker::DynamicPool - Auto-resizing worker pool for AnyEvent
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+            # identical interface and behavior to AnyEvent::Worker::Pool
+            $pool = AnyEvent::Worker::DynamicPool->new( 5, sub { ... } );
+            $pool->do(@args, sub { ... });
+
+            # alternate constructor arguments enable additional behavior
+        $pool = AnyEvent::Worker::DynamicPool->new(
+            workers => 5,
+            worker_args => [ sub { ... } ],
+            min_spare_workers => 2,
+                                    max_spare_workers => 5,
+
+        );
+
+METHODS
+  new
+    Creates a new pool of workers. This module extends
+    AnyEvent::Worker::Pool and adds dynamic resizing of the pool based on
+    the workload and the settings specified when the pool was created. The
+    settings for this module are inspired by Apache's pre-forking HTTP
+    server settings controlling how child processes are managed
+    (<corresponding Apache documentation>).
+
+    Available settings:
+
+    *   workers
+
+        number of workers to create on initialization
+
+    *   worker_args
+
+        arguments to pass to AnyEvent::Worker to create the worker
+
+    *   max_workers
+
+        hard limit on the maximum size of the pool, will be adjusted to
+        match "workers" setting if it is not specified or if the value
+        specified is less than the initial number of workers requested.
+
+    *   min_spare_workers
+
+        instructs the pool to always have this number of idle workers
+        waiting for new jobs, will be set to 0 if it is not specified or to
+        match the "workers" setting if it is greater than the initial number
+        of workers requested.
+
+    *   max_spare_workers
+
+        instructs the pool to reap any idle workers above this amount, will
+        be adjusted to match "workers" setting if it is not specified or is
+        less than the initial number of workers requested
+
+  most_workers_in_pool
+    Returns the maximum size of this pool. Will always be less than or equal
+    to the "max_workers" setting.
+
+  num_available_workers
+  can_expand
+    Compares the total number of workers with the "max_workers" setting.
+
+  needs_more
+    Compares the number of available workers with the "min_spare_workers"
+    setting.
+
+  needs_less
+    Compares the number of available workers with the "max_spare_workers"
+    setting.
+
+  take_worker
+    Overrides AnyEvent::Worker::DynamicPool's "take_worker" method. Extra
+    workers will be created if there are no spares and the total number of
+    workers is not greater than the "max_workers" setting. The
+    "min_spare_workers" setting will also be considered and additional
+    workers will be created if the number of available workers is too low.
+
+  ret_worker
+    Overrides AnyEvent::Worker::DynamicPool's "ret_worker" method. Extra
+    workers will be reaped after they finish a job if the number of
+    available workers exceeds the "max_spare_workers" setting.
+
+SEE ALSO
+    *   AnyEvent::Worker::Pool
+
+    *   AnyEvent::Worker
+
+    *   AnyEvent
+
+AUTHOR
+    Brian Phillips <bphillips@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Brian Phillips.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
